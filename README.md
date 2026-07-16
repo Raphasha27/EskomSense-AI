@@ -21,7 +21,7 @@ Energy intelligence platform that predicts load shedding schedules, monitors con
 
 ## Features
 
-- **Load Shedding Prediction** — ML models trained on Eskom historical data
+- **Load Shedding Prediction** — API prototype (mock data — ML model integration in progress)
 - **Consumption Monitoring** — Real-time energy usage analytics
 - **Solar Optimization** — Battery storage and solar panel efficiency recommendations
 - **Cost Savings** — Personalized energy-saving insights
@@ -57,3 +57,4 @@ Contact → https://github.com/Raphasha27
 ## License
 
 MIT — see [LICENSE](LICENSE)
+
