@@ -23,7 +23,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://portfolio-iota-eight-90.vercel.app", "http://localhost:5173", "http://localhost:3000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -47,3 +47,4 @@ app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
 @app.get("/")
 async def serve_index():
     return FileResponse(str(static_dir / "index.html"))
+
