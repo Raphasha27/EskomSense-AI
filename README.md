@@ -2,6 +2,8 @@
 
 # EskomSense-AI
 
+[![CI](https://github.com/Raphasha27/EskomSense-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/Raphasha27/EskomSense-AI/actions/workflows/ci.yml)
+
 **AI-powered energy monitoring and prediction for South Africa**
 
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
