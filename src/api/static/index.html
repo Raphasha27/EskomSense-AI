@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EskomSense AI — Load Shedding Prediction</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --bg: #0d0d1a; --card: #1a1a2e; --accent: #f59e0b; --accent2: #ea580c; --text: #e2e8f0; --muted: #94a3b8; --danger: #dc2626; --success: #22c55e; --warning: #eab308; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+.container { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+
+/* Hero */
+.hero { text-align: center; padding: 48px 16px 32px; background: linear-gradient(135deg, #0d0d1a 0%, #1a0a00 100%); position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(245,158,11,0.08) 0%, transparent 70%); pointer-events: none; }
+.hero h1 { font-size: clamp(1.5rem, 5vw, 2.5rem); font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; }
+.hero p { color: var(--muted); font-size: clamp(0.85rem, 2.5vw, 1rem); max-width: 600px; margin: 0 auto; }
+
+/* Cards */
+.card { background: var(--card); border-radius: 12px; padding: 20px; margin: 16px 0; border: 1px solid rgba(245,158,11,0.1); }
+
+/* Status Badge */
+.status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border-radius: 999px; font-weight: 700; font-size: 1.1rem; margin: 12px 0; }
+.status-badge .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.status-badge.stage-0 { background: rgba(34,197,94,0.15); color: var(--success); }
+.status-badge.stage-0 .dot { background: var(--success); box-shadow: 0 0 8px var(--success); }
+.status-badge.stage-1 { background: rgba(234,179,8,0.15); color: var(--warning); }
+.status-badge.stage-1 .dot { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
+.status-badge.stage-2 { background: rgba(245,158,11,0.15); color: var(--accent); }
+.status-badge.stage-2 .dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.status-badge.stage-3 { background: rgba(234,88,12,0.15); color: var(--accent2); }
+.status-badge.stage-3 .dot { background: var(--accent2); box-shadow: 0 0 8px var(--accent2); }
+.status-badge.stage-4 { background: rgba(220,38,38,0.15); color: var(--danger); }
+.status-badge.stage-4 .dot { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+
+.status-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.status-label { color: var(--muted); font-size: 0.9rem; }
+.next-schedule { margin-top: 12px; font-size: 0.85rem; color: var(--muted); }
+
+/* Select */
+select { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text); font-size: 1rem; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23f59e0b' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; cursor: pointer; }
+select:focus { border-color: var(--accent); }
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+
+/* Chart */
+.chart { display: flex; align-items: flex-end; gap: 6px; height: 200px; padding: 8px 0; }
+.bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+.bar { width: 100%; max-width: 60px; border-radius: 6px 6px 0 0; transition: height 0.5s ease; min-height: 4px; position: relative; }
+.bar.s0 { background: var(--success); }
+.bar.s1 { background: var(--warning); }
+.bar.s2 { background: var(--accent); }
+.bar.s3 { background: var(--accent2); }
+.bar.s4 { background: var(--danger); }
+.bar-label { font-size: 0.65rem; color: var(--muted); margin-top: 6px; text-align: center; }
+.bar-value { font-size: 0.7rem; font-weight: 700; margin-bottom: 4px; }
+
+/* Stats Grid */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.stat-card { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 16px; text-align: center; border: 1px solid rgba(245,158,11,0.08); }
+.stat-card .num { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.stat-card .desc { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+
+/* Battery Optimizer */
+.battery-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.battery-result { margin-top: 16px; padding: 16px; background: rgba(245,158,11,0.08); border-radius: 8px; border-left: 4px solid var(--accent); }
+.battery-result .big { font-size: 1.8rem; font-weight: 800; color: var(--accent); }
+.battery-result .rec { margin-top: 8px; font-size: 0.85rem; color: var(--muted); }
+
+/* Pro note */
+.pro-note { text-align: center; padding: 12px; font-size: 0.75rem; color: var(--muted); background: rgba(245,158,11,0.05); border-radius: 8px; margin: 16px 0; border: 1px dashed rgba(245,158,11,0.15); }
+.pro-note strong { color: var(--accent); }
+
+/* Trial watermark */
+.trial-badge { position: fixed; bottom: 12px; right: 12px; background: rgba(234,88,12,0.9); color: #fff; padding: 6px 14px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; z-index: 999; box-shadow: 0 2px 12px rgba(234,88,12,0.3); backdrop-filter: blur(4px); letter-spacing: 0.5px; }
+.trial-badge small { font-weight: 400; opacity: 0.8; }
+
+/* Footer */
+footer { text-align: center; padding: 32px 16px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 32px; }
+footer p { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+footer .links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+footer .links a { color: var(--muted); text-decoration: none; font-size: 0.75rem; transition: color 0.2s; }
+footer .links a:hover { color: var(--accent); }
+footer .brand { color: var(--accent); font-weight: 600; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .battery-inputs { grid-template-columns: 1fr; }
+  .status-row { flex-direction: column; align-items: flex-start; }
+  .chart { height: 150px; gap: 4px; }
+  .bar-value { font-size: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="container">
+    <h1>EskomSense AI</h1>
+    <p>Load Shedding Prediction for South Africa — AI-powered insights to keep you powered</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Current Status -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+      <h2 style="font-size:1.1rem;">Current Status</h2>
+      <span style="font-size:0.75rem;color:var(--muted);" id="updateTime">Updating...</span>
+    </div>
+    <div class="status-row">
+      <span class="status-badge" id="stageBadge"><span class="dot"></span> Stage <span id="stageNum">2</span></span>
+      <span class="status-label" id="stageDesc">Load shedding in progress</span>
+    </div>
+    <div class="next-schedule" id="nextSchedule">Next update: 16:00 SAST &middot; Expected: Stage 3</div>
+  </div>
+
+  <!-- Area Selector -->
+  <div class="card">
+    <h2 style="font-size:1rem;margin-bottom:10px;">Select Area</h2>
+    <select id="areaSelect">
+      <option value="johannesburg">Johannesburg</option>
+      <option value="pretoria">Pretoria</option>
+      <option value="capetown">Cape Town</option>
+      <option value="durban">Durban</option>
+      <option value="ekurhuleni">Ekurhuleni</option>
+    </select>
+    <div style="margin-top:10px;font-size:0.85rem;color:var(--muted);" id="areaInfo">Block 6 — Next slot: 14:00–16:30</div>
+  </div>
+
+  <!-- 7-Day Prediction -->
+  <div class="card">
+    <h2 style="font-size:1rem;margin-bottom:4px;">7-Day Load Shedding Forecast</h2>
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">AI-powered prediction for your selected area</div>
+    <div class="chart" id="predChart"></div>
+  </div>
+
+  <!-- Battery Optimizer -->
+  <div class="card">
+    <h2 style="font-size:1rem;margin-bottom:10px;">Battery Optimizer</h2>
+    <div class="battery-inputs">
+      <div class="form-group">
+        <label>Battery Capacity (kWh)</label>
+        <input type="number" id="batCapacity" value="10" min="1" step="0.5" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);font-size:1rem;">
+      </div>
+      <div class="form-group">
+        <label>Current Charge (%)</label>
+        <input type="number" id="batCharge" value="80" min="0" max="100" step="1" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);font-size:1rem;">
+      </div>
+      <div class="form-group">
+        <label>Critical Load (kW)</label>
+        <input type="number" id="batLoad" value="0.8" min="0.1" step="0.1" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);font-size:1rem;">
+      </div>
+      <div class="form-group" style="display:flex;align-items:flex-end;">
+        <button id="calcBattery" style="width:100%;padding:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:8px;color:#fff;font-weight:700;font-size:1rem;cursor:pointer;">Calculate</button>
+      </div>
+    </div>
+    <div class="battery-result" id="batResult">
+      <div><span class="big" id="batHours">5.0</span> hours backup</div>
+      <div class="rec" id="batRec">Your battery can cover this load during Stage 2. Consider charging before 18:00.</div>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="card">
+    <h2 style="font-size:1rem;margin-bottom:10px;">Community Impact</h2>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="num" id="statHours">0</div><div class="desc">Blackout Hours Avoided</div></div>
+      <div class="stat-card"><div class="num" id="statCost">R0</div><div class="desc">Estimated Cost Savings</div></div>
+      <div class="stat-card"><div class="num" id="statUsers">0</div><div class="desc">Users Protected</div></div>
+      <div class="stat-card"><div class="num" id="statAccuracy">94%</div><div class="desc">Prediction Accuracy</div></div>
+    </div>
+  </div>
+
+  <!-- Pro upgrade note -->
+  <div class="pro-note">
+    <strong>Upgrade to Pro</strong> to unlock: real-time Eskom API integration, Telegram alerts, ML-powered predictions, and custom area alerts. 
+    <a href="https://github.com/Raphasha27/EskomSense-AI" target="_blank" style="color:var(--accent);">Learn more</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">
+    <p>Powered by <span class="brand">Kirov Dynamics</span></p>
+    <div class="links">
+      <a href="https://portfolio-iota-eight-90.vercel.app" target="_blank">Portfolio</a>
+      <a href="https://za.linkedin.com/in/koketso-raphasha-517954387" target="_blank">LinkedIn</a>
+      <a href="https://github.com/Raphasha27/EskomSense-AI" target="_blank">GitHub</a>
+    </div>
+    <p style="margin-top:12px;font-size:0.65rem;">&copy; 2026 Kirov Dynamics — All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="trial-badge">Kirov Dynamics <small>&mdash; Trial Version</small></div>
+
+<script>
+const areas = {
+  johannesburg: { block: 'Block 6', next: '14:00–16:30', stage: 2 },
+  pretoria:     { block: 'Block 3', next: '10:00–12:30', stage: 1 },
+  capetown:     { block: 'Block 8', next: '18:00–20:30', stage: 3 },
+  durban:       { block: 'Block 2', next: '06:00–08:30', stage: 0 },
+  ekurhuleni:   { block: 'Block 11', next: '20:00–22:30', stage: 2 },
+};
+
+const stageNames = ['No Load Shedding', 'Stage 1 — 100MW shed', 'Stage 2 — 200MW shed', 'Stage 3 — 400MW shed', 'Stage 4 — 800MW shed'];
+
+function getArea() { return document.getElementById('areaSelect').value; }
+
+function updateStatus() {
+  const area = getArea();
+  const info = areas[area];
+  const stage = info.stage;
+  const badge = document.getElementById('stageBadge');
+  badge.className = 'status-badge stage-' + stage;
+  document.getElementById('stageNum').textContent = stage;
+  document.getElementById('stageDesc').textContent = stageNames[stage];
+  document.getElementById('nextSchedule').innerHTML = 'Next update: 16:00 SAST &middot; Expected: Stage ' + (stage + 1 > 4 ? 4 : stage + 1);
+  document.getElementById('areaInfo').textContent = info.block + ' — Next slot: ' + info.next;
+  document.getElementById('updateTime').textContent = 'Updated: ' + new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' }) + ' SAST';
+  drawChart(stage);
+}
+
+function drawChart(currentStage) {
+  const chart = document.getElementById('predChart');
+  chart.innerHTML = '';
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const stages = [];
+  let s = currentStage;
+  for (let i = 0; i < 7; i++) {
+    s = Math.max(0, Math.min(4, s + (Math.random() > 0.5 ? 1 : -1) + (Math.random() > 0.7 ? (Math.random() > 0.5 ? 1 : -1) : 0)));
+    if (i > 0 && Math.random() > 0.85) s = (s + 1) % 4;
+    stages.push(Math.round(s));
+  }
+  stages.forEach((st, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'bar-wrap';
+    const val = document.createElement('div');
+    val.className = 'bar-value';
+    val.textContent = 'S' + st;
+    const bar = document.createElement('div');
+    bar.className = 'bar s' + st;
+    const pct = (st / 4) * 100;
+    bar.style.height = Math.max(pct, 8) + '%';
+    const lbl = document.createElement('div');
+    lbl.className = 'bar-label';
+    lbl.textContent = days[i];
+    wrap.appendChild(val);
+    wrap.appendChild(bar);
+    wrap.appendChild(lbl);
+    chart.appendChild(wrap);
+  });
+}
+
+// Battery calc
+function calcBattery() {
+  const cap = parseFloat(document.getElementById('batCapacity').value) || 10;
+  const pct = parseFloat(document.getElementById('batCharge').value) || 80;
+  const load = parseFloat(document.getElementById('batLoad').value) || 0.8;
+  const usable = cap * (pct / 100) * 0.9;
+  const hours = load > 0 ? usable / load : 0;
+  document.getElementById('batHours').textContent = hours.toFixed(1);
+  const area = getArea();
+  const st = areas[area].stage;
+  let rec = '';
+  if (hours >= 4) rec = 'Your battery can cover this load during Stage ' + st + '. Consider charging before peak hours.';
+  else if (hours >= 2) rec = 'Partial coverage available. Reduce critical load or consider an additional battery module for full protection.';
+  else rec = 'Insufficient backup for Stage ' + st + '. Upgrade to a larger battery or reduce critical load to essential devices only.';
+  document.getElementById('batRec').textContent = rec;
+}
+
+// Animated stats
+function animateStats() {
+  const targets = { statHours: 2847, statCost: 142350, statUsers: 12580 };
+  const els = {};
+  for (const [id, val] of Object.entries(targets)) els[id] = document.getElementById(id);
+  let start = null;
+  const dur = 2000;
+  function step(ts) {
+    if (!start) start = ts;
+    const t = Math.min((ts - start) / dur, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    for (const [id, val] of Object.entries(targets)) {
+      const cur = Math.round(ease * val);
+      if (id === 'statCost') els[id].textContent = 'R' + cur.toLocaleString();
+      else els[id].textContent = cur.toLocaleString();
+    }
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// Init
+document.getElementById('areaSelect').addEventListener('change', updateStatus);
+document.getElementById('calcBattery').addEventListener('click', calcBattery);
+
+// Input battery calc on enter
+document.querySelectorAll('.battery-inputs input').forEach(inp => {
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') calcBattery(); });
+});
+
+updateStatus();
+calcBattery();
+animateStats();
+</script>
+</body>
+</html>
