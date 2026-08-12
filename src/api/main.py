@@ -40,8 +40,8 @@ async def add_headers(request, call_next):
 
 
 static_dir = Path(__file__).parent / "static"
-static_dir.mkdir(exist_ok=True)
-app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
+if static_dir.is_dir():
+    app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
 
 
 @app.get("/")
