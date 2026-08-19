@@ -2,6 +2,9 @@
 
 # EskomSense-AI
 
+> **Live Now:** [https://eskomsense-ai.vercel.app](https://eskomsense-ai.vercel.app)
+> Run it instantly — no setup needed. Free-tier hosted build by Kirov Dynamics.
+
 [![CI](https://github.com/Raphasha27/EskomSense-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/Raphasha27/EskomSense-AI/actions/workflows/ci.yml)
 
 **AI-powered energy monitoring and prediction for South Africa**
@@ -46,14 +49,16 @@ python run.py
 | [WaterWatch-SA](https://github.com/Raphasha27/WaterWatch-SA) | Water monitoring and conservation AI |
 | [Mzansi-AgriAI](https://github.com/Raphasha27/Mzansi-AgriAI) | Agricultural intelligence platform |
 
+> Note: companion repos above are private. The full set of live demos lives in the [Demos Hub](https://raphasha27.github.io/raphasha-demos/).
+
 ## Product Ladder
 
 ```
 GitHub (this repo)
     ↓
-Live Demo → https://github.com/Raphasha27/EskomSense-AI
+Live Demo → https://eskomsense-ai.vercel.app
     ↓
-Contact → https://github.com/Raphasha27
+Demos Hub → https://raphasha27.github.io/raphasha-demos/
 ```
 
 ## License
