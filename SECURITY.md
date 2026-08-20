@@ -1,11 +1,7 @@
 # Security Policy
 
 ## Supported Versions
-
-We actively support and patch the latest version of this repository.
+Only the latest version of this project is currently supported with security updates.
 
 ## Reporting a Vulnerability
-
-If you find a security vulnerability, please do NOT open a public issue. Instead, report it privately by opening a draft [Security Advisory](https://github.com/Raphasha27/EskomSense-AI/security/advisories) on GitHub.
-
-We will investigate and respond within 48 hours.
+Please do not report security vulnerabilities through public GitHub issues. Instead, please report them to the repository owner privately.
