@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import List
-
 import numpy as np
 import torch
 from fastapi import FastAPI, HTTPException
@@ -52,7 +49,7 @@ def _load_model() -> EskomLSTM:
 class PredictRequest(BaseModel):
     """Request body for ``POST /predict``."""
 
-    sequence: List[float] = Field(
+    sequence: list[float] = Field(
         ...,
         min_length=1,
         description="Historical load values (most recent last).",

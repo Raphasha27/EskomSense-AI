@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 import torch
@@ -47,8 +47,8 @@ class Trainer:
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
         self.patience = patience
 
-        self.train_losses: List[float] = []
-        self.val_losses: List[float] = []
+        self.train_losses: list[float] = []
+        self.val_losses: list[float] = []
         self.best_val_loss = float("inf")
         self._wait = 0
 
@@ -65,7 +65,8 @@ class Trainer:
         epochs: int = 50,
         lr: float = 1e-3,
         batch_size: int = 32,
-    ) -> Dict[str, Any]:
+        patience: int = 10,
+    ) -> dict[str, Any]:
         """Run the full training loop.
 
         Returns
@@ -171,10 +172,10 @@ class Trainer:
         return running / len(loader.dataset)
 
     def _save_checkpoint(self, epoch: int) -> None:
-        path = self.checkpoint_dir / f"best_model.pt"
+        path = self.checkpoint_dir / "best_model.pt"
         torch.save(self.model.state_dict(), path)
 
-    def _save_history(self, summary: Dict[str, Any]) -> None:
+    def _save_history(self, summary: dict[str, Any]) -> None:
         path = self.checkpoint_dir / "training_history.json"
         with open(path, "w") as f:
             json.dump(summary, f, indent=2)

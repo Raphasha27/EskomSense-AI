@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Dict
-
 import numpy as np
 
 
 def compute_metrics(
     y_true: np.ndarray,
     y_pred: np.ndarray,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Compute regression metrics.
 
     Parameters
