@@ -1,43 +1,40 @@
-# Python
+# Dependencies
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.Python
-
-# Virtual environments
 .venv/
 venv/
-env/
 
-# Model artefacts
+# Build
+build/
+dist/
+*.egg-info/
+
+# Models
 models/
+*.pt
+*.pth
+*.onnx
 
 # Data
 data/
 *.csv
-!tests/fixtures/*.csv
 
-# IDE / OS
+# IDE
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
+
+# OS
 .DS_Store
-Thumbs.db
 
 # Environment
 .env
-.env.*
+.env.local
 
-# Coverage
-htmlcov/
+# Test
 .coverage
-.coverage.*
-coverage.xml
+htmlcov/
+.pytest_cache/
+.mypy_cache/
 
-# Distribution
-dist/
-build/
-*.egg-info/
+# Docker
+docker-compose.override.yml
