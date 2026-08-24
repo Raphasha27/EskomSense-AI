@@ -18,6 +18,7 @@ from src.training.trainer import Trainer
 def set_seed(seed: int) -> None:
     """Ensure reproducibility."""
     import random
+
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -91,7 +92,10 @@ def main() -> None:
         patience=args.patience,
     )
     summary = trainer.train(
-        X_train, y_train, X_val, y_val,
+        X_train,
+        y_train,
+        X_val,
+        y_val,
         epochs=args.epochs,
         lr=args.lr,
         batch_size=args.batch_size,

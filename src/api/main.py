@@ -46,6 +46,7 @@ def _load_model() -> EskomLSTM:
 # Pydantic schemas
 # ---------------------------------------------------------------------------
 
+
 class PredictRequest(BaseModel):
     """Request body for ``POST /predict``."""
 
@@ -84,6 +85,7 @@ class HealthResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
+
 
 @app.get("/health", response_model=HealthResponse)
 async def health() -> HealthResponse:

@@ -146,9 +146,7 @@ class Trainer:
         ds = TensorDataset(X_t, y_t)
         return DataLoader(ds, batch_size=batch_size, shuffle=shuffle)
 
-    def _train_epoch(
-        self, loader: DataLoader, criterion: nn.Module, optimizer: Adam
-    ) -> float:
+    def _train_epoch(self, loader: DataLoader, criterion: nn.Module, optimizer: Adam) -> float:
         self.model.train()
         running = 0.0
         for X_batch, y_batch in loader:
