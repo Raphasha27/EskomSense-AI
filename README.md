@@ -1,11 +1,12 @@
+[![CI](https://github.com/Raphasha27/EskomSense-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/Raphasha27/EskomSense-AI/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 # EskomSense AI
 
 > Predictive Load Forecasting for the South African Power Grid
 
-![CI](https://github.com/user/EskomSense-AI/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.12-blue?style=flat-square&logo=python)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?style=flat-square&logo=pytorch)
-![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 ## Overview
 
