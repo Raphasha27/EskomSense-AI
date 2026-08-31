@@ -131,3 +131,5 @@ EskomSense-AI/
 | R2     | --      |
 
 *Run python scripts/train.py to populate results.*
+
+<!-- 2026-08-31 17:04:21 -->
