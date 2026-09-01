@@ -117,29 +117,35 @@ class TestEskomLSTMEdge:
 
 class TestDataPipelineEdge:
     def test_load_csv_missing_target_column(self, tmp_path: Path):
-        df = pd.DataFrame({"timestamp": pd.date_range("2024-01-01", periods=10, freq="h"), "other_col": range(10)})
+        df = pd.DataFrame(
+            {"timestamp": pd.date_range("2024-01-01", periods=10, freq="h"), "other_col": range(10)}
+        )
         csv_path = tmp_path / "bad.csv"
         df.to_csv(csv_path, index=False)
 
         from src.data.preprocessing import DataPipeline
+
         pipe = DataPipeline(target_column="load_mw")
         with pytest.raises(ValueError, match="not in"):
             pipe.load_csv(csv_path)
 
     def test_normalise_single_value(self):
         from src.data.preprocessing import DataPipeline
+
         pipe = DataPipeline()
         result = pipe.normalise(np.array([5.0]))
         assert result[0] == pytest.approx(0.0) or result[0] == pytest.approx(1.0)
 
     def test_normalise_constant_values(self):
         from src.data.preprocessing import DataPipeline
+
         pipe = DataPipeline()
         result = pipe.normalise(np.array([5.0, 5.0, 5.0]))
         assert all(v >= 0.0 and v <= 1.0 for v in result)
 
     def test_create_sequences_too_few_values(self):
         from src.data.preprocessing import DataPipeline
+
         pipe = DataPipeline(sequence_length=24)
         values = np.arange(10, dtype=np.float32)
         X, y = pipe.create_sequences(values)
@@ -148,6 +154,7 @@ class TestDataPipelineEdge:
 
     def test_train_val_split_single_sample(self):
         from src.data.preprocessing import DataPipeline
+
         pipe = DataPipeline(val_split=0.2)
         X = np.array([[1, 2, 3]])
         y = np.array([4.0])
@@ -156,14 +163,17 @@ class TestDataPipelineEdge:
 
     def test_prepare_with_small_dataset(self, tmp_path: Path):
         n = 30
-        df = pd.DataFrame({
-            "timestamp": pd.date_range("2024-01-01", periods=n, freq="h"),
-            "load_mw": np.random.uniform(3000, 5000, size=n),
-        })
+        df = pd.DataFrame(
+            {
+                "timestamp": pd.date_range("2024-01-01", periods=n, freq="h"),
+                "load_mw": np.random.uniform(3000, 5000, size=n),
+            }
+        )
         csv_path = tmp_path / "small.csv"
         df.to_csv(csv_path, index=False)
 
         from src.data.preprocessing import DataPipeline
+
         pipe = DataPipeline(sequence_length=24, target_column="load_mw", val_split=0.2)
         X_train, y_train, X_val, y_val = pipe.prepare(csv_path)
         assert X_train.ndim == 2
@@ -194,6 +204,14 @@ class TestAPIEdge:
         resp = client.get("/model/info")
         assert resp.status_code == 200
         body = resp.json()
-        required_fields = ["model_name", "hidden_size", "num_layers", "dropout", "parameter_count", "device", "checkpoint_exists"]
+        required_fields = [
+            "model_name",
+            "hidden_size",
+            "num_layers",
+            "dropout",
+            "parameter_count",
+            "device",
+            "checkpoint_exists",
+        ]
         for field in required_fields:
             assert field in body, f"Missing field: {field}"
